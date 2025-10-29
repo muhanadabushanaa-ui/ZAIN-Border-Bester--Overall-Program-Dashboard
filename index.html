@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ZOI — KPI Viewer</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="./config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0b0c10; --card:#13151a; --muted:#9aa0a6; --fg:#e8eaed; --accent:#7dd3fc; }
+  *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--fg)}
+  .wrap{max-width:1200px;margin:24px auto;padding:0 16px}
+  .grid{display:grid;gap:16px}
+  .cards{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .card{background:var(--card);border:1px solid #22252b;border-radius:16px;padding:16px}
+  .title{font-weight:800;font-size:22px;margin:6px 0 16px}
+  .row{display:flex;gap:12px;align-items:center;justify-content:space-between}
+  .kpi{font-size:28px;font-weight:800}
+  .muted{color:var(--muted);font-size:12px}
+  a{color:var(--accent);text-decoration:none}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px;border-top:1px solid #22252b}
+  th{text-align:right;color:#b8bfc7}
+  .badge{font-size:12px;padding:4px 8px;border-radius:999px;background:#1f2631}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="row">
+      <div class="title">📈 ZOI — KPI Trends</div>
+      <div class="muted" id="updatedAt"></div>
+    </div>
+
+    <div class="grid cards">
+      <div class="card">
+        <div class="row"><div>Progress Today</div><span class="badge" id="activeProjects"></span></div>
+        <div class="kpi" id="progressToday">-- %</div>
+        <div class="muted">Average across active projects</div>
+      </div>
+      <div class="card">
+        <div class="row"><div>Daily Quantity</div></div>
+        <div class="kpi"><span id="qtyToday">--</span> <span class="muted" id="uomToday"></span></div>
+        <div class="muted">Aggregated today</div>
+      </div>
+      <div class="card">
+        <div class="row"><div>Teams Active</div></div>
+        <div class="kpi" id="teamsActive">--</div>
+        <div class="muted">From daily logs</div>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:16px">
+      <div class="card">
+        <div class="row"><div>Progress % — last 14 days</div></div>
+        <canvas id="chartProgress" height="120"></canvas>
+      </div>
+      <div class="card">
+        <div class="row"><div>Daily Quantity — last 14 days</div></div>
+        <canvas id="chartQty" height="120"></canvas>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="row"><div>Latest PDFs</div><a href="#" id="openDrive" target="_blank">Open OneDrive</a></div>
+      <table id="tblReports">
+        <thead><tr><th>التاريخ</th><th>المشروع</th><th>الرابط</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+<script src="./viewer.js"></script>
+</body>
+</html>

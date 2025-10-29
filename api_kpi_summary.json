@@ -1,0 +1,54 @@
+{
+  "name": "API — KPI Summary",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "kpi/summary",
+        "methods": [
+          "GET"
+        ]
+      },
+      "type": "n8n-nodes-base.webhook",
+      "name": "Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Example aggregation; adjust to your schema\nwith d as (select generate_series(current_date-13, current_date, '1 day')::date as day),\np as (select id, name from projects where status='active'),\npd as (\n  select project_id, log_date::date as day, sum(coalesce(qty,0)) as qty\n  from daily_logs\n  group by project_id, log_date::date\n),\nprog as (\n  select k.project_id, k.kpi_date as day, k.progress_percent\n  from kpi_snapshots k\n  where k.kpi_date >= current_date-13\n)\nselect\n  json_agg(distinct p.name) as projects,\n  'm' as uom,\n  (select count(distinct team_id) from daily_logs where log_date=current_date) as teams_active_today,\n  json_agg(json_build_object('date', d.day, 'average',\n    (select round(avg(progress_percent),1) from prog pr join p on p.id=pr.project_id where pr.day=d.day)\n  ) order by d.day) as progress,\n  json_agg(json_build_object('date', d.day, 'total',\n    (select sum(qty) from pd join p on p.id=pd.project_id where pd.day=d.day)\n  ) order by d.day) as quantity\nfrom d, p\n"
+      },
+      "type": "n8n-nodes-base.postgres",
+      "name": "Query KPI"
+    },
+    {
+      "parameters": {
+        "functionCode": "return items;"
+      },
+      "type": "n8n-nodes-base.function",
+      "name": "Pass"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Query KPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query KPI": {
+      "main": [
+        [
+          {
+            "node": "Pass",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

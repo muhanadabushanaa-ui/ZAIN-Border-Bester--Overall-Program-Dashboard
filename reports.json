@@ -1,0 +1,14 @@
+{
+  "items": [
+    {
+      "date": "2025-10-29",
+      "project": "Duba FH OSP",
+      "url": "https://example.com/daily_Duba.pdf"
+    },
+    {
+      "date": "2025-10-28",
+      "project": "KAEC",
+      "url": "https://example.com/daily_KAEC.pdf"
+    }
+  ]
+}

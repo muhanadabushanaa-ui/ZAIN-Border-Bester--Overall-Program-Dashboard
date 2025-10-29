@@ -1,0 +1,54 @@
+{
+  "name": "API — Reports List (OneDrive URLs)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "reports/list",
+        "methods": [
+          "GET"
+        ]
+      },
+      "type": "n8n-nodes-base.webhook",
+      "name": "Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- If you stored OneDrive web URL in kpi_snapshots.pdf_url\nselect json_agg(json_build_object(\n  'date', k.kpi_date,\n  'project', p.name,\n  'url', k.pdf_url\n) order by k.kpi_date desc) as items\nfrom kpi_snapshots k\njoin projects p on p.id = k.project_id\nwhere k.kpi_date >= current_date - 7\n"
+      },
+      "type": "n8n-nodes-base.postgres",
+      "name": "Query Reports"
+    },
+    {
+      "parameters": {
+        "functionCode": "return items;"
+      },
+      "type": "n8n-nodes-base.function",
+      "name": "Pass"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Query Reports",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Reports": {
+      "main": [
+        [
+          {
+            "node": "Pass",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
